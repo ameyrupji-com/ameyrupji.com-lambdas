@@ -1,0 +1,65 @@
+version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@1.0.4
+
+references:
+
+deploy_base_image: &deploy_base_image
+  circleci/python:2.7
+
+working_directory: &working_directory
+  ~/ameyrupji-lambdas
+
+deploy_default_config: &deploy_default_config
+  docker:
+    - image: *deploy_base_image
+  working_directory: *working_directory
+
+repo_cache_key: &repo_cache_key
+  ameyrupji-com-lambdas-{{ .Branch }}-{{ .Revision }}
+
+restore_repo: &restore_repo
+  restore_cache:
+    key: *repo_cache_key
+
+save_repo: &save_repo
+  save_cache:
+    key: *repo_cache_key
+    paths:
+      - *working_directory
+
+jobs:
+  build:
+    <<: *build_default_config
+    steps:
+      - checkout
+      - run: 
+          name: build
+          command: | 
+            cd src/
+            python package-lambdas.py
+      - *save_repo
+  upload:
+    <<: *deploy_default_config
+    steps:
+      - *restore_repo
+      - aws-s3/copy:
+          from: /home/circleci/ameyrupji-lambdas/src/zipped_lambdas/ 
+          to: 's3://ameyrupji.com/v1.0.0/'
+          arguments: --recursive
+workflows:
+  version: 2
+  build-upload:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: 
+                - master
+      - upload:
+          requires:
+              - build
+          filters:
+              branches:
+                only: master
