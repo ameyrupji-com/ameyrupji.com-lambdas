@@ -1,54 +1,54 @@
 import boto3
+import json
+
 from botocore.exceptions import ClientError
 
-SENDER = "Contact Form <contactform@ameyrupji.com>"
-RECIPIENT = "contactme@ameyrupji.com"
-CONFIGURATION_SET = "ConfigSet"
-AWS_REGION = "us-east-1"
-SUBJECT = ""
-BODY_TEXT = ()
-BODY_HTML = """<html>
-<head></head>
-<body>
-  <h1>Amazon SES Test (SDK for Python)</h1>
-  <p>This email was sent with
-    <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-    <a href='https://aws.amazon.com/sdk-for-python/'>
-      AWS SDK for Python (Boto)</a>.</p>
-</body>
-</html>"""            
+def lambda_handler(event, context):
+    SENDER = "Contact Form <contactform@ameyrupji.com>"
+    RECIPIENT = "ameyrupji@gmail.com"
+    # CONFIGURATION_SET = "ConfigSet"
+    AWS_REGION = "us-east-1"
+    SUBJECT = "Contact Form Submitted"
+    BODY_TEXT = ()
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+    <h1>Contact form submitted.</h1>
+    <p>Details:</p>
+    <p>{from_content}</p>
+    </body>
+    </html>""".format(form_content=json.dumps(event))        
+    CHARSET = "UTF-8"
 
-CHARSET = "UTF-8"
-
-client = boto3.client('ses',region_name=AWS_REGION)
-try:
-    response = client.send_email(
-        Destination={
-            'ToAddresses': [
-                RECIPIENT,
-            ],
-        },
-        Message={
-            'Body': {
-                'Html': {
-                    'Charset': CHARSET,
-                    'Data': BODY_HTML,
+    client = boto3.client('ses',region_name=AWS_REGION)
+    try:
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
                 },
-                'Text': {
+                'Subject': {
                     'Charset': CHARSET,
-                    'Data': BODY_TEXT,
+                    'Data': SUBJECT,
                 },
             },
-            'Subject': {
-                'Charset': CHARSET,
-                'Data': SUBJECT,
-            },
-        },
-        Source=SENDER,
-        # ConfigurationSetName=CONFIGURATION_SET,
-    )
-except ClientError as e:
-    print(e.response['Error']['Message'])
-else:
-    print("Email sent! Message ID:"),
-    print(response['MessageId'])
+            Source=SENDER,
+            # ConfigurationSetName=CONFIGURATION_SET,
+        )
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['MessageId'])
