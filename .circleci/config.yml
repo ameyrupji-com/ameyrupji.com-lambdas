@@ -11,7 +11,7 @@ deploy_base_image: &deploy_base_image
 working_directory: &working_directory
   ~/ameyrupji-lambdas
 
-deploy_default_config: &deploy_default_config
+default_config: &default_config
   docker:
     - image: *deploy_base_image
   working_directory: *working_directory
@@ -31,7 +31,7 @@ save_repo: &save_repo
 
 jobs:
   build:
-    <<: *build_default_config
+    <<: *default_config
     steps:
       - checkout
       - run: 
@@ -41,7 +41,7 @@ jobs:
             python package-lambdas.py
       - *save_repo
   upload:
-    <<: *deploy_default_config
+    <<: *default_config
     steps:
       - *restore_repo
       - aws-s3/copy:
