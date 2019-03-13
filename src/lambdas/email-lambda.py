@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     <body>
     <h1>Contact form submitted.</h1>
     <p>Details:</p>
-    <p>{from_content}</p>
+    <p>{form_content}</p>
     </body>
     </html>""".format(form_content=json.dumps(event))        
     CHARSET = "UTF-8"
