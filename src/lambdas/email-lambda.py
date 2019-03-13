@@ -9,7 +9,7 @@ def lambda_handler(event, context):
     # CONFIGURATION_SET = "ConfigSet"
     AWS_REGION = "us-east-1"
     SUBJECT = "Contact Form Submitted"
-    BODY_TEXT = ()
+    BODY_TEXT = (json.dumps(event))
     BODY_HTML = """<html>
     <head></head>
     <body>
