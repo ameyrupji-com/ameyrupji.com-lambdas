@@ -45,7 +45,7 @@ jobs:
     steps:
       - *restore_repo
       - aws-s3/copy:
-          from: /home/circleci/ameyrupji-lambdas/src/zipped_lambdas/ 
+          from: /home/circleci/ameyrupji-lambdas/src/lambdas/zipped/ 
           to: 's3://ameyrupji.com-assets/v1.0.0/'
           arguments: --recursive
 workflows:

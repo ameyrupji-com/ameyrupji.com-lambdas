@@ -1,24 +1,29 @@
 import os
-import zipfile
 import shutil
+import sys
+import zipfile
 
-def package_lambdas():
 
-    folder = 'lambdas/'
-    zipped_folder = 'zipped_' + folder
+def package_lambdas(directory, file_pattern):
+    zipped_directory = directory + 'zipped/'
     
-    if os.path.exists(zipped_folder):
-        shutil.rmtree(zipped_folder)
-    
-    os.makedirs(zipped_folder)
-    for root, dirs, files in os.walk(folder):
+    shutil.rmtree(zipped_directory, ignore_errors=True)
+    for root, dirs, files in os.walk(directory):
+        os.makedirs(zipped_directory)
         for file in files:
-            print('Zipping file `' + file + '` ...')
-            zipf = zipfile.ZipFile(zipped_folder + file + '.zip', 'w', zipfile.ZIP_DEFLATED)
-            path = os.path.join(root, file)
-            base_path = os.path.basename(path)
-            zipf.write(path, base_path)
-            zipf.close()
+            print('Zipping: `' + os.path.join(root + file))
+            with zipfile.ZipFile(zipped_directory + file + '.zip', 'w', zipfile.ZIP_DEFLATED) as my_zip:
+                print(' Added file `' + file + '`')
+
+                my_zip.write(directory + file, './' + file)
             
 if __name__ == "__main__":
-    package_lambdas()
+    print('Supplied args...')
+    for arg in sys.argv[1:]:
+        print(arg)
+    
+    print('Starting zipping lambda functions...')
+    directory = './lambdas/'
+    package_lambdas(directory, '.py')
+
+    print('Zipping finished!')
