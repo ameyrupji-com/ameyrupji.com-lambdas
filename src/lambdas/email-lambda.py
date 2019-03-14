@@ -48,7 +48,13 @@ def lambda_handler(event, context):
             # ConfigurationSetName=CONFIGURATION_SET,
         )
     except ClientError as e:
-        print(e.response['Error']['Message'])
+        print(E)
+        return {
+            "statusCode": 500,
+            "body": json.dumps(e)
+        }
     else:
-        print("Email sent! Message ID:"),
-        print(response['MessageId'])
+        return {
+            "statusCode": 200,
+            "body": json.dumps(e)
+        }
